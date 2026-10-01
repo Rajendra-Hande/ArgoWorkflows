@@ -1,0 +1,63 @@
+🚀 Kubernetes can run containers, but who decides what should run first, what should run next, and what should happen when something fails?
+That orchestration layer is where Argo Workflows shines.
+Think of it as the engine that coordinates containerized tasks across Kubernetes, ensuring the right workload runs at the right time, with the right dependencies and retry logic.
+Recently, I spent some time learning Argo Workflows. Here are my key takeaways 👇
+What is Argo Workflows?
+Argo Workflows is an open-source, container-native workflow engine for Kubernetes. It enables you to define, orchestrate, and execute multi-step workflows where each step runs as its own containerized task.
+What does "Container-Native" mean?
+A container-native workflow engine is designed specifically for containers and Kubernetes.
+✅ Every task runs inside its own container
+✅ Each workflow step is executed as a Kubernetes pod
+✅ Argo automatically starts, monitors, and manages the execution of each step
+✅ Kubernetes handles scheduling and scaling behind the scenes
+What is a Workflow Engine?
+A workflow engine manages a sequence of tasks by determining:
+•	What should run
+•	In what order it should run
+•	Which tasks depend on others
+•	How failures and retries should be handled
+How Argo Works
+1️⃣ Define a workflow in YAML as a Kubernetes Custom Resource (CRD)
+2️⃣ Create Templates that describe the tasks to execute
+3️⃣ Specify an Entrypoint that determines where execution begins
+4️⃣ Argo launches each task as a Kubernetes pod
+5️⃣ Argo tracks execution status and manages dependencies, retries, and outcomes
+Key Concepts
+🔹 Workflow
+The central object in Argo.
+A Workflow:
+•	Describes the work to be executed
+•	Tracks the execution state of the workflow
+Unlike a static configuration, a Workflow is also a live instance that maintains the status of each step throughout execution.
+🔹 Templates
+Think of Templates as functions in a programming language.
+A template can:
+•	Run a container
+•	Execute a script
+•	Process data
+•	Invoke other templates
+🔹 Entrypoint
+Think of the Entrypoint as the Main() method in a C# application.
+It tells Argo:
+"Start executing the workflow from this template."
+Practical Example
+Let's say we have a simple workflow that prints "hello world".
+YAML
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: hello-world-
+spec:
+entrypoint: hello-world 
+templates:
+- name: hello-world
+container:
+  image: busybox
+  command: [echo]
+  args: ["hello world"]
+What's happening here?
+🔹 Workflow: Defines the overall process
+🔹 Entrypoint: hello-world is the first template Argo will execute
+🔹 Template: Contains the instructions for the task
+🔹 Container: Argo creates a Kubernetes pod using the busybox image
+🔹 Command: Executes echo "hello world"
